@@ -57,3 +57,41 @@ export function getMostListenedArtistByCount(listenEvents) {
 
   return topArtist;
 }
+    //between 5PM and 4:00 AM on Friday, which means that the day of week is 5 (Friday) and the time is between 17:00 and 4:00
+
+export function getMostListenedSongOnFriday(listenEvents) {
+  const fridaySongCounts = {};
+
+  for (const event of listenEvents) {
+    const timestamp = new Date(event.timestamp);
+    const dayOfWeek = timestamp.getUTCDay();
+    const hour = timestamp.getUTCHours();
+
+    if (dayOfWeek === 5 && (hour >= 17 || hour < 4)) {
+      const songId = event.song_id;
+
+      if (!fridaySongCounts[songId]) {
+        fridaySongCounts[songId] = 1;
+      } else {
+        fridaySongCounts[songId] = fridaySongCounts[songId] + 1;
+      }
+    }
+  }
+
+  let mostPlayedSongId = null;
+  let highestCount = 0;
+
+  for (const songId in fridaySongCounts) {
+    if (fridaySongCounts[songId] > highestCount) {
+      highestCount = fridaySongCounts[songId];
+      mostPlayedSongId = songId;
+    }
+  }
+
+  if (mostPlayedSongId === null) {
+    return null;
+  }
+
+  return getSong(mostPlayedSongId);
+} 
+

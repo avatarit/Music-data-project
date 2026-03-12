@@ -1,5 +1,5 @@
 import { getUserIDs, getListenEvents } from "./data.mjs";
-import {getMostListenedSongByCount, getMostListenedArtistByCount } from "./common.mjs";
+import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday } from "./common.mjs";
 
 const selectUser = document.getElementById("user-select");
 const results = document.getElementById("user-info");
@@ -32,6 +32,7 @@ selectUser.addEventListener("change", function () {
 
   const topSong = getMostListenedSongByCount(listenEvents);
   const topArtist = getMostListenedArtistByCount(listenEvents);
+  const topFridaySong = getMostListenedSongOnFriday(listenEvents);
 
   const songParagraph = document.createElement("p");
   songParagraph.textContent =
@@ -41,6 +42,15 @@ selectUser.addEventListener("change", function () {
   artistParagraph.textContent =
     "Most listened artist: " + topArtist;
 
+    const fridaySongParagraph = document.createElement("p");
+    if (topFridaySong) {
+      fridaySongParagraph.textContent =
+        "Most listened song on FridayBetween 4:00AM and 5:00PM: " + topFridaySong.artist + " - " + topFridaySong.title;
+    } else {
+      fridaySongParagraph.textContent =
+        "No songs listened to on Friday Between 4:00AM and 5:00PM.";
+    } 
   results.appendChild(songParagraph);
   results.appendChild(artistParagraph);
+  results.appendChild(fridaySongParagraph);
 });
