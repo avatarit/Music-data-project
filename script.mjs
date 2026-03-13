@@ -1,5 +1,5 @@
 import { getUserIDs, getListenEvents } from "./data.mjs";
-import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday } from "./common.mjs";
+import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime } from "./common.mjs";
 
 const selectUser = document.getElementById("user-select");
 const results = document.getElementById("user-info");
@@ -33,6 +33,9 @@ selectUser.addEventListener("change", function () {
   const topSong = getMostListenedSongByCount(listenEvents);
   const topArtist = getMostListenedArtistByCount(listenEvents);
   const topFridaySong = getMostListenedSongOnFriday(listenEvents);
+  const topSongByTime = getMostListenedSongByTime(listenEvents);
+  const topArtistByTime = getMostListenedArtistByTime(listenEvents);
+  const topFridaySongByTime = getMostListenedSongOnFridayByTime(listenEvents);
 
   const songParagraph = document.createElement("p");
   songParagraph.textContent =
@@ -50,7 +53,32 @@ selectUser.addEventListener("change", function () {
       fridaySongParagraph.textContent =
         "No songs listened to on Friday Between 4:00AM and 5:00PM.";
     } 
+
+    const songByTimeParagraph = document.createElement("p");
+    songByTimeParagraph.textContent =   
+    "Most listened song by time: " + topSongByTime.artist + " - " + topSongByTime.title;
+
+    const artistByTimeParagraph = document.createElement("p");
+    artistByTimeParagraph.textContent =   
+    "Most listened artist by time: " + topArtistByTime;
+    
+    const fridaySongByTimeParagraph = document.createElement("p");
+    if (topFridaySongByTime) {
+      fridaySongByTimeParagraph.textContent =
+        "Most listened song on Friday by time: " + topFridaySongByTime.artist + " - " + topFridaySongByTime.title;
+    } else {
+      fridaySongByTimeParagraph.textContent =
+        "No songs listened to on Friday by time.";
+    } 
+
+
+
+    
   results.appendChild(songParagraph);
   results.appendChild(artistParagraph);
   results.appendChild(fridaySongParagraph);
+
+  results.appendChild(songByTimeParagraph);
+  results.appendChild(artistByTimeParagraph);
+  results.appendChild(fridaySongByTimeParagraph);
 });
