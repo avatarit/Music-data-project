@@ -192,3 +192,28 @@ export function getMostListenedSongOnFridayByTime(listenEvents) {
 
   return getSong(mostPlayedSongId);
 }
+
+export function getMostListenedSongByTimeInRawData(listenEvents) {
+
+let currentSongId = null;
+let currentCount = 0;
+
+let topSongId = null;
+let topCount = 0;
+
+for (const event of listenEvents) {
+  if (event.song_id === currentSongId) {
+    currentCount++;
+  } else {
+    currentSongId = event.song_id;
+    currentCount = 1;
+  }
+
+  if (currentCount > topCount) {
+    topCount = currentCount;
+    topSongId = currentSongId;
+  }
+}
+return getSong(topSongId);
+
+}

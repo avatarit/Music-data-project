@@ -1,5 +1,5 @@
 import { getUserIDs, getListenEvents } from "./data.mjs";
-import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime } from "./common.mjs";
+import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime, getMostListenedSongByTimeInRawData } from "./common.mjs";
 
 const selectUser = document.getElementById("user-select");
 const results = document.getElementById("user-info");
@@ -71,7 +71,15 @@ selectUser.addEventListener("change", function () {
         "No songs listened to on Friday by time.";
     } 
 
-
+    const topSongByTimeInRawData = getMostListenedSongByTimeInRawData(listenEvents);
+    const topSongByTimeInRawDataParagraph = document.createElement("p");
+    if (topSongByTimeInRawData) {
+      topSongByTimeInRawDataParagraph.textContent =
+        "Most listened song by time in raw data: " + topSongByTimeInRawData.artist + " - " + topSongByTimeInRawData.title;
+    } else {
+      topSongByTimeInRawDataParagraph.textContent =
+        "No songs listened to by time in raw data.";
+    }
 
     
   results.appendChild(songParagraph);
@@ -81,4 +89,5 @@ selectUser.addEventListener("change", function () {
   results.appendChild(songByTimeParagraph);
   results.appendChild(artistByTimeParagraph);
   results.appendChild(fridaySongByTimeParagraph);
+  results.appendChild(topSongByTimeInRawDataParagraph);
 });
