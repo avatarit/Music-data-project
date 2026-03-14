@@ -217,3 +217,54 @@ for (const event of listenEvents) {
 return getSong(topSongId);
 
 }
+
+export function getSongsEveryDay(listenEvents) {
+
+  const songsPerDay = {};
+
+  for (const event of listenEvents) {
+
+    const date = new Date(event.timestamp);
+
+    const day =
+      date.getFullYear() + "-" +
+      (date.getMonth() + 1) + "-" +
+      date.getDate();
+
+    if (!songsPerDay[day]) {
+      songsPerDay[day] = [];
+    }
+
+    if (!songsPerDay[day].includes(event.song_id)) {
+      songsPerDay[day].push(event.song_id);
+    }
+
+  }
+
+  const days = Object.keys(songsPerDay);
+
+  if (days.length === 0) {
+    return [];
+  }
+
+  let commonSongs = songsPerDay[days[0]];
+
+  for (let i = 1; i < days.length; i++) {
+
+    const daySongs = songsPerDay[days[i]];
+
+    commonSongs = commonSongs.filter(song =>
+      daySongs.includes(song)
+    );
+
+  }
+
+  const result = [];
+
+  for (const songId of commonSongs) {
+    result.push(getSong(songId));
+  }
+
+  return result;
+
+}
