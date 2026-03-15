@@ -1,8 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Data Project</title>
     <script type="module" src="script.mjs"></script>
   </head>
   <body>
+    <main>
+      <h1>Music Data Project</h1>
+
+      <label for="user-select">Select a user</label>
+      <select id="user-select">
+        <option value="" disabled selected>Select a user</option>
+      </select>
+
+      <section id="user-info" aria-live="polite"></section>
+    </main>
   </body>
 </html>

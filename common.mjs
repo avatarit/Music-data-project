@@ -1,3 +1,295 @@
-import { getUserIDs } from "./data.mjs";
+import { getSong } from "./data.mjs";
 
-export const countUsers = () => getUserIDs().length;
+export function getMostListenedSongByCount(listenEvents) {
+  const songCounts = {};
+
+  for (const event of listenEvents) {
+    const songId = event.song_id;
+
+    if (!songCounts[songId]) {
+      songCounts[songId] = 1;
+    } else {
+      songCounts[songId] = songCounts[songId] + 1;
+    }
+  }
+
+  let mostPlayedSongId = null;
+  let highestCount = 0;
+
+  for (const songId in songCounts) {
+    if (songCounts[songId] > highestCount) {
+      highestCount = songCounts[songId];
+      mostPlayedSongId = songId;
+    }
+  }
+
+  if (mostPlayedSongId === null) {
+    return null;
+  }
+
+  return getSong(mostPlayedSongId);
+}
+
+export function getMostListenedArtistByCount(listenEvents) {
+  const artistCounts = {};
+
+  for (const event of listenEvents) {
+    const song = getSong(event.song_id);
+    const artist = song.artist;
+
+    if (!artistCounts[artist]) {
+      artistCounts[artist] = 1;
+    } else {
+      artistCounts[artist] = artistCounts[artist] + 1;
+    }
+  }
+
+  let topArtist = null;
+  let highestCount = 0;
+
+  for (const artist in artistCounts) {
+    if (artistCounts[artist] > highestCount) {
+      highestCount = artistCounts[artist];
+      topArtist = artist;
+    }
+  }
+
+  return topArtist;
+}
+
+export function getMostListenedSongOnFriday(listenEvents) {
+  const fridaySongCounts = {};
+
+  for (const event of listenEvents) {
+    const timestamp = new Date(event.timestamp);
+    const dayOfWeek = timestamp.getDay();
+    const hour = timestamp.getHours();
+
+    if ((dayOfWeek === 5 && hour >= 17) || (dayOfWeek === 6 && hour < 4)) {
+      const songId = event.song_id;
+
+      if (!fridaySongCounts[songId]) {
+        fridaySongCounts[songId] = 1;
+      } else {
+        fridaySongCounts[songId] = fridaySongCounts[songId] + 1;
+      }
+    }
+  }
+
+  let mostPlayedSongId = null;
+  let highestCount = 0;
+
+  for (const songId in fridaySongCounts) {
+    if (fridaySongCounts[songId] > highestCount) {
+      highestCount = fridaySongCounts[songId];
+      mostPlayedSongId = songId;
+    }
+  }
+
+  if (mostPlayedSongId === null) {
+    return null;
+  }
+
+  return getSong(mostPlayedSongId);
+}
+
+export function getMostListenedSongByTime(listenEvents) {
+  const songTimes = {};
+
+  for (const event of listenEvents) {
+    const songId = event.song_id;
+    const song = getSong(songId);
+
+    if (!songTimes[songId]) {
+      songTimes[songId] = song.duration_seconds;
+    } else {
+      songTimes[songId] = songTimes[songId] + song.duration_seconds;
+    }
+  }
+
+  let topSongId = null;
+  let highestTime = 0;
+
+  for (const songId in songTimes) {
+    if (songTimes[songId] > highestTime) {
+      highestTime = songTimes[songId];
+      topSongId = songId;
+    }
+  }
+
+  if (topSongId === null) {
+    return null;
+  }
+
+  return getSong(topSongId);
+}
+
+export function getMostListenedArtistByTime(listenEvents) {
+  const artistTimes = {};
+
+  for (const event of listenEvents) {
+    const song = getSong(event.song_id);
+    const artist = song.artist;
+
+    if (!artistTimes[artist]) {
+      artistTimes[artist] = song.duration_seconds;
+    } else {
+      artistTimes[artist] = artistTimes[artist] + song.duration_seconds;
+    }
+  }
+
+  let topArtist = null;
+  let highestTime = 0;
+
+  for (const artist in artistTimes) {
+    if (artistTimes[artist] > highestTime) {
+      highestTime = artistTimes[artist];
+      topArtist = artist;
+    }
+  }
+
+  return topArtist;
+}
+
+export function getMostListenedSongOnFridayByTime(listenEvents) {
+  const fridaySongTimes = {};
+
+  for (const event of listenEvents) {
+    const timestamp = new Date(event.timestamp);
+    const dayOfWeek = timestamp.getDay();
+    const hour = timestamp.getHours();
+    const song = getSong(event.song_id);
+
+    if ((dayOfWeek === 5 && hour >= 17) || (dayOfWeek === 6 && hour < 4)) {
+      const songId = event.song_id;
+
+      if (!fridaySongTimes[songId]) {
+        fridaySongTimes[songId] = song.duration_seconds;
+      } else {
+        fridaySongTimes[songId] =
+          fridaySongTimes[songId] + song.duration_seconds;
+      }
+    }
+  }
+
+  let mostPlayedSongId = null;
+  let highestTime = 0;
+
+  for (const songId in fridaySongTimes) {
+    if (fridaySongTimes[songId] > highestTime) {
+      highestTime = fridaySongTimes[songId];
+      mostPlayedSongId = songId;
+    }
+  }
+
+  if (mostPlayedSongId === null) {
+    return null;
+  }
+
+  return getSong(mostPlayedSongId);
+}
+
+export function getMostListenedSongByTimeInRawData(listenEvents) {
+  if (listenEvents.length === 0) {
+    return null;
+  }
+
+  let currentSongId = listenEvents[0].song_id;
+  let currentCount = 1;
+
+  let topSongId = currentSongId;
+  let topCount = 1;
+
+  for (let i = 1; i < listenEvents.length; i++) {
+    if (listenEvents[i].song_id === currentSongId) {
+      currentCount++;
+    } else {
+      currentSongId = listenEvents[i].song_id;
+      currentCount = 1;
+    }
+
+    if (currentCount > topCount) {
+      topCount = currentCount;
+      topSongId = currentSongId;
+    }
+  }
+
+  return {
+    song: getSong(topSongId),
+    count: topCount
+  };
+}
+
+export function getSongsEveryDay(listenEvents) {
+  const songsPerDay = {};
+
+  for (const event of listenEvents) {
+    const date = new Date(event.timestamp);
+
+    const day =
+      date.getFullYear() + "-" +
+      (date.getMonth() + 1) + "-" +
+      date.getDate();
+
+    if (!songsPerDay[day]) {
+      songsPerDay[day] = [];
+    }
+
+    if (!songsPerDay[day].includes(event.song_id)) {
+      songsPerDay[day].push(event.song_id);
+    }
+  }
+
+  const days = Object.keys(songsPerDay);
+
+  if (days.length === 0) {
+    return [];
+  }
+
+  let commonSongs = songsPerDay[days[0]];
+
+  for (let i = 1; i < days.length; i++) {
+    const daySongs = songsPerDay[days[i]];
+
+    commonSongs = commonSongs.filter(function (song) {
+      return daySongs.includes(song);
+    });
+  }
+
+  const result = [];
+
+  for (const songId of commonSongs) {
+    result.push(getSong(songId));
+  }
+
+  return result;
+}
+
+export function getTopGenres(listenEvents) {
+  const genreCounts = {};
+
+  for (const event of listenEvents) {
+    const song = getSong(event.song_id);
+    const genre = song.genre;
+
+    if (!genreCounts[genre]) {
+      genreCounts[genre] = 1;
+    } else {
+      genreCounts[genre] = genreCounts[genre] + 1;
+    }
+  }
+
+  const genresArray = Object.entries(genreCounts);
+
+  genresArray.sort(function (a, b) {
+    return b[1] - a[1];
+  });
+
+  const topGenres = [];
+
+  for (let i = 0; i < genresArray.length && i < 3; i++) {
+    topGenres.push(genresArray[i][0]);
+  }
+
+  return topGenres;
+}

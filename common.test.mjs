@@ -1,7 +1,21 @@
 import assert from "node:assert";
 import test from "node:test";
-import { countUsers } from "./common.mjs";
+import { getMostListenedSongByTimeInRawData } from "./common.mjs";
 
-test("User count is correct", () => {
-  assert.equal(countUsers(), 4);
+const listenEvents = [
+  { song_id: "song-1" },
+  { song_id: "song-1" },
+  { song_id: "song-2" },
+  { song_id: "song-3" },
+  { song_id: "song-3" },
+  { song_id: "song-3" }
+];
+
+test("getMostListenedSongByTimeInRawData returns the correct streak", () => {
+
+  const result = getMostListenedSongByTimeInRawData(listenEvents);
+
+  assert.equal(result.count, 3);
+  assert.equal(result.song.id, "song-3");
+
 });
