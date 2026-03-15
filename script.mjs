@@ -1,5 +1,15 @@
 import { getUserIDs, getListenEvents } from "./data.mjs";
-import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime, getMostListenedSongByTimeInRawData, getSongsEveryDay, getSongsEveryDay} from "./common.mjs";
+import {
+  getMostListenedSongByCount,
+  getMostListenedArtistByCount,
+  getMostListenedSongOnFriday,
+  getMostListenedSongByTime,
+  getMostListenedSongOnFridayByTime,
+  getMostListenedArtistByTime,
+  getMostListenedSongByTimeInRawData,
+  getSongsEveryDay,
+  getTopGenres
+} from "./common.mjs";
 
 const selectUser = document.getElementById("user-select");
 const results = document.getElementById("user-info");
@@ -26,7 +36,9 @@ selectUser.addEventListener("change", function () {
   const listenEvents = getListenEvents(selectedUserId);
 
   if (listenEvents.length === 0) {
-    results.textContent = "This user didn't listen to any songs.";
+    const message = document.createElement("p");
+    message.textContent = "This user didn't listen to any songs.";
+    results.appendChild(message);
     return;
   }
 
@@ -36,86 +48,99 @@ selectUser.addEventListener("change", function () {
   const topSongByTime = getMostListenedSongByTime(listenEvents);
   const topArtistByTime = getMostListenedArtistByTime(listenEvents);
   const topFridaySongByTime = getMostListenedSongOnFridayByTime(listenEvents);
+  const topSongByTimeInRawData = getMostListenedSongByTimeInRawData(listenEvents);
+  const songsEveryDay = getSongsEveryDay(listenEvents);
+  const topGenres = getTopGenres(listenEvents);
 
-  const songParagraph = document.createElement("p");
-  songParagraph.textContent =
+  const section = document.createElement("section");
+  const heading = document.createElement("h2");
+  heading.textContent = "Listening summary";
+
+  const list = document.createElement("ul");
+
+  const songItem = document.createElement("li");
+  songItem.textContent =
     "Most listened song: " + topSong.artist + " - " + topSong.title;
+  list.appendChild(songItem);
 
-  const artistParagraph = document.createElement("p");
-  artistParagraph.textContent =
+  const artistItem = document.createElement("li");
+  artistItem.textContent =
     "Most listened artist: " + topArtist;
+  list.appendChild(artistItem);
 
-    const fridaySongParagraph = document.createElement("p");
-    if (topFridaySong) {
-      fridaySongParagraph.textContent =
-        "Most listened song on FridayBetween 4:00AM and 5:00PM: " + topFridaySong.artist + " - " + topFridaySong.title;
-    } else {
-      fridaySongParagraph.textContent =
-        "No songs listened to on Friday Between 4:00AM and 5:00PM.";
-    } 
+  if (topFridaySong) {
+    const fridaySongItem = document.createElement("li");
+    fridaySongItem.textContent =
+      "Most listened song on Friday night: " +
+      topFridaySong.artist +
+      " - " +
+      topFridaySong.title;
+    list.appendChild(fridaySongItem);
+  }
 
-    const songByTimeParagraph = document.createElement("p");
-    songByTimeParagraph.textContent =   
-    "Most listened song by time: " + topSongByTime.artist + " - " + topSongByTime.title;
+  const songByTimeItem = document.createElement("li");
+  songByTimeItem.textContent =
+    "Most listened song by time: " +
+    topSongByTime.artist +
+    " - " +
+    topSongByTime.title;
+  list.appendChild(songByTimeItem);
 
-    const artistByTimeParagraph = document.createElement("p");
-    artistByTimeParagraph.textContent =   
+  const artistByTimeItem = document.createElement("li");
+  artistByTimeItem.textContent =
     "Most listened artist by time: " + topArtistByTime;
-    
-    const fridaySongByTimeParagraph = document.createElement("p");
-    if (topFridaySongByTime) {
-      fridaySongByTimeParagraph.textContent =
-        "Most listened song on Friday by time: " + topFridaySongByTime.artist + " - " + topFridaySongByTime.title;
-    } else {
-      fridaySongByTimeParagraph.textContent =
-        "No songs listened to on Friday by time.";
-    } 
+  list.appendChild(artistByTimeItem);
 
-    const topSongByTimeInRawData = getMostListenedSongByTimeInRawData(listenEvents);
-    const topSongByTimeInRawDataParagraph = document.createElement("p");
-    if (topSongByTimeInRawData) {
-      topSongByTimeInRawDataParagraph.textContent =
-        "Most listened song by time in raw data: " + topSongByTimeInRawData.artist + " - " + topSongByTimeInRawData.title;
-    } else {
-      topSongByTimeInRawDataParagraph.textContent =
-        "No songs listened to by time in raw data.";
-    }
+  if (topFridaySongByTime) {
+    const fridaySongByTimeItem = document.createElement("li");
+    fridaySongByTimeItem.textContent =
+      "Most listened song on Friday night by time: " +
+      topFridaySongByTime.artist +
+      " - " +
+      topFridaySongByTime.title;
+    list.appendChild(fridaySongByTimeItem);
+  }
 
-    const songsEveryDay = getSongsEveryDay(listenEvents);
-    const topSongEveryDayParagraph = document.createElement("p");
-    if (songsEveryDay.length > 0) {
-      topSongEveryDayParagraph.textContent =
-        "Songs listened to every day: " + songsEveryDay.map(song => song.artist + " - " + song.title).join(", ");
-    } else {
-      topSongEveryDayParagraph.textContent =
-        "No songs listened to every day.";
-    } 
+  if (topSongByTimeInRawData) {
+    const streakItem = document.createElement("li");
+    streakItem.textContent =
+      "Longest streak: " +
+      topSongByTimeInRawData.song.artist +
+      " - " +
+      topSongByTimeInRawData.song.title +
+      " (length: " +
+      topSongByTimeInRawData.count +
+      ")";
+    list.appendChild(streakItem);
+  }
 
-    const topGenres = getTopGenres(listenEvents);
+  if (songsEveryDay.length > 0) {
+    const everyDayItem = document.createElement("li");
+    everyDayItem.textContent =
+      "Songs listened to every day: " +
+      songsEveryDay
+        .map(function (song) {
+          return song.artist + " - " + song.title;
+        })
+        .join(", ");
+    list.appendChild(everyDayItem);
+  }
 
-    const topGenresParagraph = document.createElement("p");
+  if (topGenres.length === 1) {
+    const genreItem = document.createElement("li");
+    genreItem.textContent = "Top genre: " + topGenres.join(", ");
+    list.appendChild(genreItem);
+  } else if (topGenres.length === 2) {
+    const genreItem = document.createElement("li");
+    genreItem.textContent = "Top 2 genres: " + topGenres.join(", ");
+    list.appendChild(genreItem);
+  } else if (topGenres.length === 3) {
+    const genreItem = document.createElement("li");
+    genreItem.textContent = "Top genres: " + topGenres.join(", ");
+    list.appendChild(genreItem);
+  }
 
-    if (topGenres.length === 1) {
-      topGenresParagraph.textContent =
-        "Top genre: " + topGenres.join(", ");
-    } else if (topGenres.length === 2) {
-      topGenresParagraph.textContent =
-        "Top 2 genres: " + topGenres.join(", ");
-    } else if (topGenres.length === 3) {
-      topGenresParagraph.textContent =
-        "Top genres: " + topGenres.join(", ");
-    }
-
-  results.appendChild(songParagraph);
-  results.appendChild(artistParagraph);
-  results.appendChild(fridaySongParagraph);
-
-  results.appendChild(songByTimeParagraph);
-  results.appendChild(artistByTimeParagraph);
-  results.appendChild(fridaySongByTimeParagraph);
-  results.appendChild(topSongByTimeInRawDataParagraph);
-  results.appendChild(topSongEveryDayParagraph);
-  results.appendChild(topGenresParagraph);
-
-
+  section.appendChild(heading);
+  section.appendChild(list);
+  results.appendChild(section);
 });

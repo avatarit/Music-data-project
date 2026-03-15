@@ -1,6 +1,4 @@
-import { getSong, getListenEvents } from "./data.mjs";
-
-const listenEvents = getListenEvents();
+import { getSong } from "./data.mjs";
 
 export function getMostListenedSongByCount(listenEvents) {
   const songCounts = {};
@@ -59,14 +57,13 @@ export function getMostListenedArtistByCount(listenEvents) {
   return topArtist;
 }
 
-// Friday 5:00 PM until Saturday 4:00 AM
 export function getMostListenedSongOnFriday(listenEvents) {
   const fridaySongCounts = {};
 
   for (const event of listenEvents) {
     const timestamp = new Date(event.timestamp);
-    const dayOfWeek = timestamp.getUTCDay();
-    const hour = timestamp.getUTCHours();
+    const dayOfWeek = timestamp.getDay();
+    const hour = timestamp.getHours();
 
     if ((dayOfWeek === 5 && hour >= 17) || (dayOfWeek === 6 && hour < 4)) {
       const songId = event.song_id;
@@ -154,14 +151,13 @@ export function getMostListenedArtistByTime(listenEvents) {
   return topArtist;
 }
 
-// Friday 5:00 PM until Saturday 4:00 AM
 export function getMostListenedSongOnFridayByTime(listenEvents) {
   const fridaySongTimes = {};
 
   for (const event of listenEvents) {
     const timestamp = new Date(event.timestamp);
-    const dayOfWeek = timestamp.getUTCDay();
-    const hour = timestamp.getUTCHours();
+    const dayOfWeek = timestamp.getDay();
+    const hour = timestamp.getHours();
     const song = getSong(event.song_id);
 
     if ((dayOfWeek === 5 && hour >= 17) || (dayOfWeek === 6 && hour < 4)) {
@@ -194,36 +190,40 @@ export function getMostListenedSongOnFridayByTime(listenEvents) {
 }
 
 export function getMostListenedSongByTimeInRawData(listenEvents) {
-
-let currentSongId = null;
-let currentCount = 0;
-
-let topSongId = null;
-let topCount = 0;
-
-for (const event of listenEvents) {
-  if (event.song_id === currentSongId) {
-    currentCount++;
-  } else {
-    currentSongId = event.song_id;
-    currentCount = 1;
+  if (listenEvents.length === 0) {
+    return null;
   }
 
-  if (currentCount > topCount) {
-    topCount = currentCount;
-    topSongId = currentSongId;
-  }
-}
-return getSong(topSongId);
+  let currentSongId = listenEvents[0].song_id;
+  let currentCount = 1;
 
+  let topSongId = currentSongId;
+  let topCount = 1;
+
+  for (let i = 1; i < listenEvents.length; i++) {
+    if (listenEvents[i].song_id === currentSongId) {
+      currentCount++;
+    } else {
+      currentSongId = listenEvents[i].song_id;
+      currentCount = 1;
+    }
+
+    if (currentCount > topCount) {
+      topCount = currentCount;
+      topSongId = currentSongId;
+    }
+  }
+
+  return {
+    song: getSong(topSongId),
+    count: topCount
+  };
 }
 
 export function getSongsEveryDay(listenEvents) {
-
   const songsPerDay = {};
 
   for (const event of listenEvents) {
-
     const date = new Date(event.timestamp);
 
     const day =
@@ -238,7 +238,6 @@ export function getSongsEveryDay(listenEvents) {
     if (!songsPerDay[day].includes(event.song_id)) {
       songsPerDay[day].push(event.song_id);
     }
-
   }
 
   const days = Object.keys(songsPerDay);
@@ -250,13 +249,11 @@ export function getSongsEveryDay(listenEvents) {
   let commonSongs = songsPerDay[days[0]];
 
   for (let i = 1; i < days.length; i++) {
-
     const daySongs = songsPerDay[days[i]];
 
-    commonSongs = commonSongs.filter(song =>
-      daySongs.includes(song)
-    );
-
+    commonSongs = commonSongs.filter(function (song) {
+      return daySongs.includes(song);
+    });
   }
 
   const result = [];
@@ -266,7 +263,6 @@ export function getSongsEveryDay(listenEvents) {
   }
 
   return result;
-
 }
 
 export function getTopGenres(listenEvents) {
