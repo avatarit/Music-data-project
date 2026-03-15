@@ -268,3 +268,32 @@ export function getSongsEveryDay(listenEvents) {
   return result;
 
 }
+
+export function getTopGenres(listenEvents) {
+  const genreCounts = {};
+
+  for (const event of listenEvents) {
+    const song = getSong(event.song_id);
+    const genre = song.genre;
+
+    if (!genreCounts[genre]) {
+      genreCounts[genre] = 1;
+    } else {
+      genreCounts[genre] = genreCounts[genre] + 1;
+    }
+  }
+
+  const genresArray = Object.entries(genreCounts);
+
+  genresArray.sort(function (a, b) {
+    return b[1] - a[1];
+  });
+
+  const topGenres = [];
+
+  for (let i = 0; i < genresArray.length && i < 3; i++) {
+    topGenres.push(genresArray[i][0]);
+  }
+
+  return topGenres;
+}

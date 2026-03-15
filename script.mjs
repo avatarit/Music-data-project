@@ -1,5 +1,5 @@
 import { getUserIDs, getListenEvents } from "./data.mjs";
-import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime, getMostListenedSongByTimeInRawData, getSongsEveryDay} from "./common.mjs";
+import {getMostListenedSongByCount, getMostListenedArtistByCount, getMostListenedSongOnFriday, getMostListenedSongByTime, getMostListenedSongOnFridayByTime, getMostListenedArtistByTime, getMostListenedSongByTimeInRawData, getSongsEveryDay, getSongsEveryDay} from "./common.mjs";
 
 const selectUser = document.getElementById("user-select");
 const results = document.getElementById("user-info");
@@ -90,7 +90,22 @@ selectUser.addEventListener("change", function () {
       topSongEveryDayParagraph.textContent =
         "No songs listened to every day.";
     } 
-    
+
+    const topGenres = getTopGenres(listenEvents);
+
+    const topGenresParagraph = document.createElement("p");
+
+    if (topGenres.length === 1) {
+      topGenresParagraph.textContent =
+        "Top genre: " + topGenres.join(", ");
+    } else if (topGenres.length === 2) {
+      topGenresParagraph.textContent =
+        "Top 2 genres: " + topGenres.join(", ");
+    } else if (topGenres.length === 3) {
+      topGenresParagraph.textContent =
+        "Top genres: " + topGenres.join(", ");
+    }
+
   results.appendChild(songParagraph);
   results.appendChild(artistParagraph);
   results.appendChild(fridaySongParagraph);
@@ -100,5 +115,7 @@ selectUser.addEventListener("change", function () {
   results.appendChild(fridaySongByTimeParagraph);
   results.appendChild(topSongByTimeInRawDataParagraph);
   results.appendChild(topSongEveryDayParagraph);
+  results.appendChild(topGenresParagraph);
+
 
 });
